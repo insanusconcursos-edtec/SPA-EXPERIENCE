@@ -1,0 +1,6 @@
+{
+  "name": "Spa Experience",
+  "description": "Sistema web estritamente modular, escalável e seguro para agendamento de massagens.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

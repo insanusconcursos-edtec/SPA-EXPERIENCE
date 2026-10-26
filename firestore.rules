@@ -1,0 +1,87 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper Functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'admin@spaexperience.com' ||
+        request.auth.token.email == 'spa.experience.dev@gmail.com' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && getUserData().role == 'admin')
+      );
+    }
+
+    function isTherapist() {
+      return isSignedIn() && (
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && getUserData().role == 'therapist') ||
+        exists(/databases/$(database)/documents/therapists/$(request.auth.uid))
+      );
+    }
+
+    // 1. Services Catalog - Publicly readable for Spa visitors
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 2. Additional Services (Upsells) - Publicly readable
+    match /additional_services/{additionalServiceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 3. Therapists - Publicly readable profile details
+    match /therapists/{therapistId} {
+      allow read: if true;
+      allow write: if isAdmin() || (isTherapist() && request.auth.uid == therapistId);
+    }
+
+    // 4. Users collection
+    match /users/{userId} {
+      allow read: if isSignedIn() || isAdmin();
+      allow create, update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+
+      // PII Subcollection
+      match /private/info {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // 5. Appointments
+    match /appointments/{appointmentId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if isSignedIn() || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // 6. Config & Schedules
+    match /config/{configId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /therapist_schedules/{therapistId} {
+      allow read: if true;
+      allow write: if isAdmin() || (isTherapist() && request.auth.uid == therapistId);
+    }
+
+    match /therapist_absences/{absenceId} {
+      allow read: if true;
+      allow write: if isAdmin() || isTherapist();
+    }
+  }
+}

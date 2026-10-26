@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #000000;
+  }
+}
+
+.font-serif-luxury {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+.text-gold-metallic {
+  color: #D4AF37;
+}
+
+.bg-gold-metallic {
+  background-color: #D4AF37;
+}
+
+.border-gold-metallic {
+  border-color: rgba(212, 175, 55, 0.3);
+}
+
+.border-gold-metallic-focus {
+  border-color: #D4AF37;
+}
+
+.shadow-gold-premium {
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.2);
+}
+
+.shadow-gold-glow {
+  box-shadow: 0 0 50px rgba(212, 175, 55, 0.15);
+}
