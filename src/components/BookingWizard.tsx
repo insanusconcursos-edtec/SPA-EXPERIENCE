@@ -684,37 +684,96 @@ export const BookingWizard: React.FC<BookingWizardProps> = ({ service, therapist
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-md overflow-y-auto">
       <div className="relative w-full max-w-3xl rounded-xl bg-zinc-950 border border-[#D4AF37]/30 overflow-hidden shadow-gold-glow my-8">
         
-        {/* CLOSE HEADER BUTTON */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-black/70 text-zinc-400 hover:text-[#D4AF37] border border-zinc-800 hover:border-[#D4AF37]/30 transition-all duration-300"
-        >
-          <X className="h-5 w-5" />
-        </button>
-
-        {/* PROGRESS STEP BAR */}
-        <div className="bg-[#0b0b0b] border-b border-zinc-900 px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4.5 w-4.5 text-[#D4AF37]" />
-            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest font-sans">
-              Funil de Agendamento
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-2.5">
-            {[1, 2, 3, 4, 5].map((s) => (
-              <div key={s} className="flex items-center gap-1.5">
-                <div className={`h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-300 ${
-                  step === s 
-                    ? 'bg-[#D4AF37] text-black font-black scale-110 shadow-md shadow-[#D4AF37]/20' 
-                    : step > s 
-                      ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400' 
-                      : 'bg-zinc-900 border border-zinc-800 text-zinc-500'
-                }`}>
-                  {step > s ? <Check className="h-3 w-3" /> : s}
-                </div>
-                {s < 5 && <div className="w-4 h-px bg-zinc-900" />}
+        {/* HEADER WITH INTEGRATED RESPONSIVE STEPPER & CLOSE BUTTON */}
+        <div className="bg-[#0b0b0b] border-b border-zinc-900 px-4 sm:px-6 py-3.5">
+          {/* Main Bar: Title on left, Desktop Stepper in center, Close Button on right */}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <Sparkles className="h-4 w-4 text-[#D4AF37] shrink-0" />
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] sm:text-xs font-bold text-zinc-300 uppercase tracking-widest font-sans truncate">
+                  Funil de Agendamento
+                </span>
+                <span className="text-[10px] font-bold text-[#D4AF37] sm:hidden whitespace-nowrap">
+                  • Passo {step} de 5
+                </span>
               </div>
+            </div>
+
+            {/* Desktop Stepper (sm and above) */}
+            <div className="hidden sm:flex items-center gap-2">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <div key={s} className="flex items-center gap-1.5">
+                  <div
+                    className={`h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-300 ${
+                      step === s
+                        ? 'bg-[#D4AF37] text-black font-black scale-110 shadow-md shadow-[#D4AF37]/20 ring-2 ring-[#D4AF37]/30'
+                        : step > s
+                        ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400'
+                        : 'bg-zinc-900 border border-zinc-800 text-zinc-500'
+                    }`}
+                  >
+                    {step > s ? <Check className="h-3.5 w-3.5" /> : s}
+                  </div>
+                  {s < 5 && (
+                    <ChevronRight className={`h-3 w-3 shrink-0 ${step > s ? 'text-emerald-500/60' : 'text-zinc-700'}`} />
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {/* Close Button cleanly aligned */}
+            <button
+              onClick={onClose}
+              aria-label="Fechar"
+              className="flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-full bg-zinc-900/80 text-zinc-400 hover:text-[#D4AF37] border border-zinc-800 hover:border-[#D4AF37]/30 transition-all duration-300 cursor-pointer"
+            >
+              <X className="h-4 w-4 sm:h-5 sm:w-5" />
+            </button>
+          </div>
+
+          {/* Mobile Stepper Row (Below sm): 100% visible, perfectly centered with steps & arrows, zero clipping */}
+          <div className="flex sm:hidden items-center justify-between pt-2.5 mt-2.5 border-t border-zinc-900/80 px-2">
+            {[
+              { num: 1, label: 'Extras' },
+              { num: 2, label: 'Terapeuta' },
+              { num: 3, label: 'Horário' },
+              { num: 4, label: 'Acesso' },
+              { num: 5, label: 'Pagar' },
+            ].map(({ num, label }, idx) => (
+              <React.Fragment key={num}>
+                <div className="flex flex-col items-center gap-0.5">
+                  <div
+                    className={`h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-300 ${
+                      step === num
+                        ? 'bg-[#D4AF37] text-black font-black scale-110 shadow-md shadow-[#D4AF37]/30 ring-2 ring-[#D4AF37]/40'
+                        : step > num
+                        ? 'bg-emerald-500/15 border border-emerald-500/30 text-emerald-400'
+                        : 'bg-zinc-900 border border-zinc-800 text-zinc-500'
+                    }`}
+                  >
+                    {step > num ? <Check className="h-3 w-3" /> : num}
+                  </div>
+                  <span
+                    className={`text-[8px] font-semibold tracking-tight ${
+                      step === num
+                        ? 'text-[#D4AF37]'
+                        : step > num
+                        ? 'text-emerald-400/80'
+                        : 'text-zinc-600'
+                    }`}
+                  >
+                    {label}
+                  </span>
+                </div>
+                {idx < 4 && (
+                  <ChevronRight
+                    className={`h-3 w-3 mb-2 shrink-0 ${
+                      step > num ? 'text-emerald-500/60' : 'text-zinc-700'
+                    }`}
+                  />
+                )}
+              </React.Fragment>
             ))}
           </div>
         </div>

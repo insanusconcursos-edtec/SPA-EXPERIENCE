@@ -52,8 +52,9 @@ export const AppRoutes: React.FC = () => {
         <Route path="clientes" element={<AdminClients />} />
         <Route path="massoterapeutas" element={<AdminTherapists />} />
         <Route path="horarios" element={<AdminSchedules />} />
-        <Route path="banner" element={<AdminBranding initialTab="banner" />} />
-        <Route path="logo" element={<AdminBranding initialTab="logo" />} />
+        <Route path="configuracoes" element={<AdminBranding />} />
+        <Route path="banner" element={<Navigate to="/admin/configuracoes" replace />} />
+        <Route path="logo" element={<Navigate to="/admin/configuracoes" replace />} />
       </Route>
 
       {/* Protected Therapist Portal Route */}

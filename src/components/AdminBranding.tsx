@@ -34,7 +34,7 @@ interface AdminBrandingProps {
   initialTab?: 'logo' | 'banner';
 }
 
-export const AdminBranding: React.FC<AdminBrandingProps> = ({ initialTab = 'logo' }) => {
+export const AdminBranding: React.FC<AdminBrandingProps> = ({ initialTab = 'banner' }) => {
   const [activeTab, setActiveTab] = useState<'logo' | 'banner'>(initialTab);
 
   // Logo state
@@ -201,14 +201,14 @@ export const AdminBranding: React.FC<AdminBrandingProps> = ({ initialTab = 'logo
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-widest bg-[#D4AF37]/10 text-[#D4AF37] border border-[#D4AF37]/30">
-              Personalização Visual & Marca
+              Configuração do Site
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-light text-white uppercase tracking-wider mt-2 font-serif-luxury">
-            Identidade & <span className="text-[#D4AF37]">Banners do Spa</span>
+            Configuração do Site & <span className="text-[#D4AF37]">Identidade Visual</span>
           </h1>
           <p className="text-xs text-zinc-400 mt-1 max-w-2xl">
-            Configure a logo oficial do Spa Dark Seduction e o banner de apresentação do catálogo com dimensões sob medida para Desktop e Mobile.
+            Gerencie em um só lugar o banner de apresentação do catálogo (Desktop e Mobile), a logo oficial do cabeçalho e menu, e as personalizações visuais do Spa.
           </p>
         </div>
 

@@ -13,8 +13,7 @@ import {
   Menu, 
   ArrowLeft,
   ChevronRight,
-  Palette,
-  Image as ImageIcon
+  Settings
 } from 'lucide-react';
 import { HeaderLogo } from './HeaderLogo';
 
@@ -36,8 +35,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     { id: 'clients', label: 'Clientes', path: '/admin/clientes', icon: Users },
     { id: 'therapists', label: 'Massoterapeutas', path: '/admin/massoterapeutas', icon: Users },
     { id: 'schedules', label: 'Horários de Funcionamento', path: '/admin/horarios', icon: Clock },
-    { id: 'banner', label: 'Banner do Catálogo', path: '/admin/banner', icon: ImageIcon },
-    { id: 'logo', label: 'Logo & Marca', path: '/admin/logo', icon: Palette },
+    { id: 'configuracoes', label: 'Configuração do Site', path: '/admin/configuracoes', icon: Settings },
   ];
 
   // Active item determined dynamically by current URL path

@@ -35,7 +35,11 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({ service, onClick }) =>
         {/* Hover Action Highlight */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#D4AF37] text-black shadow-lg shadow-[#D4AF37]/35 ring-4 ring-black">
-            <Play className="h-6 w-6 fill-current ml-0.5" />
+            {service.videoUrl && service.videoUrl.trim().length > 0 ? (
+              <Play className="h-6 w-6 fill-current ml-0.5" />
+            ) : (
+              <Sparkles className="h-6 w-6 text-black" />
+            )}
           </div>
         </div>
 

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Service, Therapist } from '../types';
-import { X, Clock, DollarSign, Sparkles, User, Play, HelpCircle, CheckCircle } from 'lucide-react';
+import { X, Clock, DollarSign, Sparkles, User, Play, HelpCircle, CheckCircle, ArrowLeft } from 'lucide-react';
 import { StructuredText } from './StructuredText';
 import { getTherapistImageStyle } from '../utils/imageUtils';
 
@@ -12,6 +12,8 @@ interface ServiceModalProps {
 }
 
 export const ServiceModal: React.FC<ServiceModalProps> = ({ service, therapists, onClose, onBook }) => {
+  const [isPlayingVideo, setIsPlayingVideo] = useState(false);
+
   const formattedPrice = new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
@@ -19,6 +21,25 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({ service, therapists,
 
   // Filter therapists who have this service in their specialties
   const qualifiedTherapists = therapists.filter(t => t.specialties.includes(service.id));
+
+  // Check if a valid video URL is registered
+  const hasVideo = Boolean(service.videoUrl && service.videoUrl.trim().length > 0);
+
+  const getEmbedUrl = (url?: string) => {
+    if (!url) return null;
+    const trimmed = url.trim();
+    const ytMatch = trimmed.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+    if (ytMatch && ytMatch[1]) {
+      return `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1`;
+    }
+    const vimeoMatch = trimmed.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/([^\/]*)\/videos\/|album\/(\d+)\/video\/|)(\d+)/i);
+    if (vimeoMatch && vimeoMatch[3]) {
+      return `https://player.vimeo.com/video/${vimeoMatch[3]}?autoplay=1`;
+    }
+    return null;
+  };
+
+  const embedUrl = hasVideo ? getEmbedUrl(service.videoUrl) : null;
 
   return (
     <div
@@ -35,7 +56,7 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({ service, therapists,
         <button
           id="close-modal-button"
           onClick={onClose}
-          className="absolute top-4 right-4 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-black/75 text-zinc-400 hover:text-[#D4AF37] border border-zinc-800 hover:border-[#D4AF37]/30 transition-all duration-300"
+          className="absolute top-4 right-4 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-black/75 text-zinc-400 hover:text-[#D4AF37] border border-zinc-800 hover:border-[#D4AF37]/30 transition-all duration-300 cursor-pointer"
         >
           <X className="h-5 w-5" />
         </button>
@@ -44,26 +65,63 @@ export const ServiceModal: React.FC<ServiceModalProps> = ({ service, therapists,
           {/* Left Column: Visual & Video Trailer */}
           <div className="relative bg-zinc-900">
             <div className="relative aspect-video md:aspect-[3/4] w-full overflow-hidden">
-              <img
-                src={service.imageUrl || 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=1000'}
-                alt={service.name}
-                className="h-full w-full object-cover brightness-[0.70]"
-                referrerPolicy="no-referrer"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-black/40" />
-
-              {/* Simulated Cinematic Video Play Overlay */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
-                <span className="mb-2 text-xs font-bold tracking-widest text-[#D4AF37] uppercase flex items-center gap-1">
-                  <Sparkles className="h-3 w-3" /> DEMONSTRAÇÃO CINEMÁTICA
-                </span>
-                <div className="group flex h-16 w-16 cursor-pointer items-center justify-center rounded-full bg-[#D4AF37] text-black shadow-xl shadow-[#D4AF37]/20 hover:scale-110 transition-all duration-300">
-                  <Play className="h-7 w-7 fill-current ml-1 group-hover:scale-105 transition-transform" />
+              {isPlayingVideo && hasVideo ? (
+                <div className="relative h-full w-full bg-black">
+                  {embedUrl ? (
+                    <iframe
+                      src={embedUrl}
+                      title={service.name}
+                      className="h-full w-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <video
+                      src={service.videoUrl}
+                      controls
+                      autoPlay
+                      className="h-full w-full object-cover"
+                    />
+                  )}
+                  <button
+                    onClick={() => setIsPlayingVideo(false)}
+                    className="absolute top-4 left-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/80 text-xs font-semibold text-zinc-200 border border-zinc-700 hover:border-[#D4AF37] hover:text-[#D4AF37] transition-all cursor-pointer"
+                  >
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                    Voltar para foto
+                  </button>
                 </div>
-                <p className="mt-4 text-xs text-zinc-400 font-medium max-w-[280px]">
-                  Assista à demonstração técnica da terapia (Placeholder de vídeo)
-                </p>
-              </div>
+              ) : (
+                <>
+                  <img
+                    src={service.imageUrl || 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=1000'}
+                    alt={service.name}
+                    className={`h-full w-full object-cover ${hasVideo ? 'brightness-[0.70]' : 'brightness-[0.88]'}`}
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-transparent to-black/40" />
+
+                  {/* Cinematic Video Play Overlay - ONLY when videoUrl is registered */}
+                  {hasVideo && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+                      <span className="mb-2 text-xs font-bold tracking-widest text-[#D4AF37] uppercase flex items-center gap-1">
+                        <Sparkles className="h-3 w-3" /> DEMONSTRAÇÃO CINEMÁTICA
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setIsPlayingVideo(true)}
+                        className="group flex h-16 w-16 cursor-pointer items-center justify-center rounded-full bg-[#D4AF37] text-black shadow-xl shadow-[#D4AF37]/20 hover:scale-110 transition-all duration-300"
+                        title="Assistir demonstração"
+                      >
+                        <Play className="h-7 w-7 fill-current ml-1 group-hover:scale-105 transition-transform" />
+                      </button>
+                      <p className="mt-4 text-xs text-zinc-400 font-medium max-w-[280px]">
+                        Clique para assistir à demonstração da terapia
+                      </p>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
 
